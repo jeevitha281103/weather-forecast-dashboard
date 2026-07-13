@@ -1,0 +1,194 @@
+.daily-forecast-container {
+  width: 100%;
+}
+.daily-forecast-header {
+  margin-bottom: 1rem;
+}
+.daily-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.daily-card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  animation: slideUp 0.5s var(--transition-bounce) backwards;
+  position: relative;
+  overflow: hidden;
+}
+.daily-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.daily-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+}
+.day-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 80px;
+}
+.day-name {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #ffffff;
+}
+.day-date {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+.day-emoji-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+.day-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.day-description {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: capitalize;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.day-temps {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-primary);
+  flex-shrink: 0;
+}
+.temp-max {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.temp-min {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+.day-pop {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary-light);
+  flex-shrink: 0;
+}
+.day-pop svg {
+  color: var(--color-primary-light);
+}
+.expand-trigger {
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.daily-details {
+  padding: 0 1.25rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  animation: slideDown 0.3s var(--transition-bounce);
+}
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 200px; }
+}
+.detail-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+}
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  align-items: center;
+}
+.detail-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+.detail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.detail-badge svg {
+  flex-shrink: 0;
+}
+.detail-badge-humidity {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}
+.detail-badge-wind {
+  background: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+.detail-badge-precip {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fcd34d;
+}
+
+@media (max-width: 768px) {
+  .day-description { display: none; }
+}
+
+@media (max-width: 640px) {
+  .daily-main {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  .day-info { min-width: auto; }
+  .day-description { display: none; }
+  .day-temps { margin-left: auto; }
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}

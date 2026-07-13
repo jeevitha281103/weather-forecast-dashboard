@@ -1,41 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Sun, Moon, Cloud, CloudRain, CloudLightning, CloudSnow, CloudDrizzle, Wind, CloudFog, SunMedium, CloudSun, CloudSunRain } from 'lucide-react';
-import { weatherApi } from '../services/weatherApi';
-
-const weatherIcons = {
-  clear: { day: Sun, night: Moon },
-  clouds: { day: CloudSun, night: Cloud },
-  rain: { day: CloudSunRain, night: CloudRain },
-  drizzle: { day: CloudDrizzle, night: CloudDrizzle },
-  thunderstorm: { day: CloudLightning, night: CloudLightning },
-  snow: { day: CloudSnow, night: CloudSnow },
-  mist: { day: CloudFog, night: CloudFog },
-  fog: { day: CloudFog, night: CloudFog },
-  haze: { day: CloudFog, night: CloudFog },
-  wind: { day: Wind, night: Wind },
-};
-
-function getWeatherIcon(weatherId, isDay) {
-  if (weatherId >= 200 && weatherId < 300) return weatherIcons.thunderstorm[isDay ? 'day' : 'night'];
-  if (weatherId >= 300 && weatherId < 400) return weatherIcons.drizzle[isDay ? 'day' : 'night'];
-  if (weatherId >= 500 && weatherId < 600) return weatherIcons.rain[isDay ? 'day' : 'night'];
-  if (weatherId >= 600 && weatherId < 700) return weatherIcons.snow[isDay ? 'day' : 'night'];
-  if (weatherId >= 700 && weatherId < 800) return weatherIcons.mist[isDay ? 'day' : 'night'];
-  if (weatherId === 800) return weatherIcons.clear[isDay ? 'day' : 'night'];
-  if (weatherId > 800) return weatherIcons.clouds[isDay ? 'day' : 'night'];
-  return weatherIcons.clear[isDay ? 'day' : 'night'];
-}
-
-function getWeatherType(weatherId) {
-  if (weatherId >= 200 && weatherId < 300) return 'thunderstorm';
-  if (weatherId >= 300 && weatherId < 400) return 'drizzle';
-  if (weatherId >= 500 && weatherId < 600) return 'rain';
-  if (weatherId >= 600 && weatherId < 700) return 'snow';
-  if (weatherId >= 700 && weatherId < 800) return 'mist';
-  if (weatherId === 800) return 'clear';
-  if (weatherId > 800) return 'clouds';
-  return 'clear';
-}
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { getWeatherType } from '../utils/weatherHelpers';
 
 function WeatherBackground({ type = 'clear', isDay = true, className = '' }) {
   const canvasRef = useRef(null);
@@ -272,10 +236,4 @@ function WeatherBackground({ type = 'clear', isDay = true, className = '' }) {
   );
 }
 
-function getWeatherBackgroundClass(weatherId, isDay) {
-  const type = getWeatherType(weatherId);
-  return `${type} ${isDay ? 'day' : 'night'}`;
-}
-
-export { WeatherBackground, getWeatherIcon, getWeatherType, getWeatherBackgroundClass };
 export default WeatherBackground;

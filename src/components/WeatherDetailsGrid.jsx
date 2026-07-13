@@ -1,4 +1,6 @@
-import { Droplet, Wind, Gauge, Eye, Sunrise, Sunset, Cloud, Droplets, Thermometer, Maximize, Minimize } from 'lucide-react';
+import { Droplet, Wind, Gauge, Eye, Sunrise, Sunset, Cloud, Thermometer } from 'lucide-react';
+import { getWindDirection } from '../utils/weatherHelpers';
+import './WeatherDetailsGrid.css';
 
 const DetailItems = [
   {
@@ -6,7 +8,7 @@ const DetailItems = [
     label: 'Humidity',
     icon: Droplet,
     iconBg: 'rgba(59, 130, 246, 0.15)',
-    iconColor: 'var(--color-primary)',
+    iconColor: 'var(--center-primary)',
     getValue: (current, unit) => `${current.main.humidity}%`,
     getDetail: (current) => `Dew point: ${Math.round(current.main.temp - (100 - current.main.humidity) / 5)}°C`,
   },
@@ -15,7 +17,7 @@ const DetailItems = [
     label: 'Wind',
     icon: Wind,
     iconBg: 'rgba(34, 197, 94, 0.15)',
-    iconColor: 'var(--color-success)',
+    iconColor: 'var(--center-success)',
     getValue: (current, unit) => {
       const speed = unit === 'imperial' 
         ? Math.round(current.wind.speed * 2.237) 
@@ -29,7 +31,7 @@ const DetailItems = [
     label: 'Pressure',
     icon: Gauge,
     iconBg: 'rgba(168, 85, 247, 0.15)',
-    iconColor: 'var(--color-purple)',
+    iconColor: 'var(--center-purple)',
     getValue: (current) => `${current.main.pressure} hPa`,
     getDetail: () => 'Sea level',
   },
@@ -38,7 +40,7 @@ const DetailItems = [
     label: 'Visibility',
     icon: Eye,
     iconBg: 'rgba(251, 191, 36, 0.15)',
-    iconColor: 'var(--color-accent)',
+    iconColor: 'var(--center-accent)',
     getValue: (current) => {
       const vis = current.visibility || 10000;
       return vis >= 1000 ? `${(vis / 1000).toFixed(1)} km` : `${vis} m`;
@@ -50,7 +52,7 @@ const DetailItems = [
     label: 'Cloudiness',
     icon: Cloud,
     iconBg: 'rgba(148, 163, 184, 0.15)',
-    iconColor: 'var(--color-text-muted)',
+    iconColor: 'var(--center-text-muted)',
     getValue: (current) => `${current.clouds?.all || 0}%`,
     getDetail: (current) => getCloudDescription(current.clouds?.all || 0),
   },
@@ -84,15 +86,27 @@ const DetailItems = [
     label: 'UV Index',
     icon: Sunrise,
     iconBg: 'rgba(239, 68, 68, 0.15)',
-    iconColor: 'var(--color-danger)',
-    getValue: () => '--',
-    getDetail: () => 'Data unavailable',
+    iconColor: 'var(--center-danger)',
+    getValue: (current) => {
+      const uvi = current.uvi;
+      if (uvi == null) return '--';
+      return uvi.toFixed(1);
+    },
+    getDetail: (current) => {
+      const uvi = current.uvi;
+      if (uvi == null) return 'Estimated';
+      if (uvi <= 2) return 'Low';
+      if (uvi <= 5) return 'Moderate';
+      if (uvi <= 7) return 'High';
+      if (uvi <= 10) return 'Very High';
+      return 'Extreme';
+    },
   },
   {
     key: 'sunrise',
     label: 'Sunrise',
     icon: Sunrise,
-    iconBg: 'linear-gradient(135deg, var(--color-accent), #f97316)',
+    iconBg: 'linear-gradient(135deg, var(--center-accent), #f97316)',
     iconColor: 'white',
     getValue: (current, unit, timezoneOffset) => formatTime(current.sys.sunrise, timezoneOffset),
     getDetail: () => 'Today',
@@ -101,17 +115,12 @@ const DetailItems = [
     key: 'sunset',
     label: 'Sunset',
     icon: Sunset,
-    iconBg: 'linear-gradient(135deg, #f97316, var(--color-danger))',
+    iconBg: 'linear-gradient(135deg, #f97316, var(--center-danger))',
     iconColor: 'white',
     getValue: (current, unit, timezoneOffset) => formatTime(current.sys.sunset, timezoneOffset),
     getDetail: () => 'Today',
   },
 ];
-
-function getWindDirection(deg) {
-  const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-  return directions[Math.round(deg / 22.5) % 16];
-}
 
 function getCloudDescription(percent) {
   if (percent <= 10) return 'Clear sky';
@@ -134,111 +143,26 @@ export default function WeatherDetailsGrid({ current, unit, timezoneOffset }) {
           const Icon = item.icon;
           const value = item.getValue(current, unit, timezoneOffset);
           const detail = item.getDetail(current, unit, timezoneOffset);
-          const isGradient = typeof item.iconBg === 'string' && item.iconBg.includes('gradient');
-          
           return (
             <div key={item.key} className="detail-card">
               <div 
                 className="detail-icon"
                 style={{
-                  background: isGradient ? item.iconBg : item.iconBg,
+                  background: item.iconBg,
                   color: item.iconColor,
                 }}
               >
                 <Icon size={22} />
               </div>
               <div className="detail-content">
-                <div className="detail-label">{item.label}</div>
+                <div className="detail-label text-dim">{item.label}</div>
                 <div className="detail-value">{value}</div>
-                <div className="detail-description">{detail}</div>
+                <div className="detail-description text-muted">{detail}</div>
               </div>
             </div>
           );
         })}
       </div>
-      
-      <style jsx>{`
-        .weather-details-grid {
-          width: 100%;
-        }
-        .details-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1rem;
-        }
-        .detail-card {
-          background: var(--color-bg-card);
-          border: 1px solid var(--color-border);
-          border-radius: var(--radius-lg);
-          padding: 1.25rem;
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-          transition: all var(--transition-base);
-        }
-        .detail-card:hover {
-          background: var(--color-bg-card-hover);
-          border-color: var(--color-border-strong);
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-md);
-        }
-        .detail-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 48px;
-          height: 48px;
-          border-radius: var(--radius-md);
-          flex-shrink: 0;
-        }
-        .detail-content {
-          flex: 1;
-          min-width: 0;
-        }
-        .detail-label {
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--color-text-dim);
-          font-weight: 600;
-          margin-bottom: 0.25rem;
-        }
-        .detail-value {
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: var(--color-text);
-          font-family: var(--font-primary);
-          margin-bottom: 0.125rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .detail-description {
-          font-size: 0.75rem;
-          color: var(--color-text-muted);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        @media (max-width: 1200px) {
-          .details-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-        @media (max-width: 900px) {
-          .details-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-        @media (max-width: 500px) {
-          .details-grid {
-            grid-template-columns: 1fr;
-          }
-          .detail-card {
-            padding: 1rem;
-          }
-        }
-      `}</style>
     </div>
   );
 }

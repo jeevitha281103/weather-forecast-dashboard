@@ -1,0 +1,235 @@
+.hourly-forecast-container {
+  width: 100%;
+}
+.hourly-forecast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.scroll-indicator {
+  display: flex;
+  gap: 0.375rem;
+}
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all var(--transition-fast);
+}
+.scroll-dot.visible {
+  background: var(--color-primary);
+  transform: scale(1.2);
+}
+.scroll-wrapper {
+  position: relative;
+}
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: #334155;
+  border: 1px solid transparent;
+  color: #f1f5f9;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  z-index: 10;
+  cursor: pointer;
+}
+.scroll-btn:hover {
+  background: #475569;
+}
+.scroll-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.scroll-btn-left { left: -50px; }
+.scroll-btn-right { right: -50px; }
+.hourly-scroll {
+  display: flex;
+  gap: 0;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hourly-scroll::-webkit-scrollbar { display: none; }
+.hourly-cards {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+@media (max-width: 1024px) {
+  .scroll-btn { display: none; }
+}
+@media (max-width: 640px) {
+  .hourly-forecast-header { margin-bottom: 0.75rem; }
+  .section-title { font-size: 1.125rem; }
+  .scroll-indicator { display: none; }
+}
+
+.hourly-day-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.hourly-day-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+}
+.hourly-day-name {
+  font-family: var(--font-primary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hourly-day-date {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+.hourly-day-cards {
+  display: flex;
+  gap: 0.625rem;
+}
+
+.hourly-card {
+  flex-shrink: 0;
+  width: 72px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  scroll-snap-align: start;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  animation: slideIn 0.4s var(--transition-bounce) backwards;
+  position: relative;
+}
+.hourly-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.hourly-card.current {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px var(--color-primary-glow);
+}
+.hourly-card.current::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hour-time {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.9);
+}
+.hourly-card.current .hour-time {
+  color: var(--color-primary-light);
+}
+.hour-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.1);
+}
+.hour-icon {
+  color: #f0f4f8;
+}
+.hourly-card.clear .hour-icon { color: var(--color-accent); }
+.hourly-card.rain .hour-icon,
+.hourly-card.drizzle .hour-icon { color: var(--color-primary-light); }
+.hourly-card.thunderstorm .hour-icon { color: var(--color-accent); }
+.hourly-card.snow .hour-icon { color: #e2e8f0; }
+.hourly-card.clouds .hour-icon { color: #cbd5e1; }
+.hourly-card.mist .hour-icon { color: #94a3b8; }
+.hour-temp {
+  font-family: var(--font-primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.hour-pop {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--color-primary-light);
+  background: rgba(59, 130, 246, 0.25);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-full);
+}
+.hour-pop svg {
+  color: var(--color-primary-light);
+}
+.hour-details {
+  display: flex;
+  gap: 0.375rem;
+  width: 100%;
+  justify-content: center;
+}
+.hour-details span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-full);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.hour-detail-feels {
+  background: rgba(249, 115, 22, 0.25);
+  color: #fdba74;
+}
+.hour-detail-humid {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}
+.now-indicator {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  background: var(--color-primary);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.125rem;
+}
