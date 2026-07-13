@@ -1,4 +1,3 @@
-const API_KEY_LS_KEY = 'openweather_api_key';
 const API_BASE = 'https://api.openweathermap.org/data/2.5';
 
 const fetchWithTimeout = async (url, timeout = 8000) => {
@@ -20,21 +19,17 @@ function getWeatherBackground(weatherId, isDay = true) {
   if (weatherId >= 500 && weatherId < 600) return 'rain';
   if (weatherId >= 600 && weatherId < 700) return 'snow';
   if (weatherId >= 700 && weatherId < 800) return 'mist';
-  if (weatherId === 800) return isDay ? 'clear' : 'clear';
-  if (weatherId === 801) return isDay ? 'clouds' : 'clouds';
+  if (weatherId === 800) return 'clear';
+  if (weatherId === 801) return 'clouds';
   if (weatherId > 801) return 'clouds';
   return 'clear';
 }
 
+function getApiKey() {
+  return import.meta.env.VITE_OPENWEATHER_API_KEY || '';
+}
+
 export const weatherApi = {
-  getApiKey() {
-    return import.meta.env.VITE_OPENWEATHER_API_KEY || localStorage.getItem(API_KEY_LS_KEY) || '';
-  },
-
-  setApiKey(key) {
-    localStorage.setItem(API_KEY_LS_KEY, key);
-  },
-
   getSearchHistory() {
     const saved = localStorage.getItem('search_history');
     return saved ? JSON.parse(saved) : [];
@@ -50,8 +45,8 @@ export const weatherApi = {
   getWeatherBackground,
 
   async getWeatherByCity(city) {
-    const key = this.getApiKey();
-    if (!key) throw new Error('API key required');
+    const key = getApiKey();
+    if (!key) throw new Error('API key not configured');
 
     const currentRes = await fetchWithTimeout(
       `${API_BASE}/weather?q=${encodeURIComponent(city)}&appid=${key}`
@@ -59,7 +54,7 @@ export const weatherApi = {
 
     if (!currentRes.ok) {
       if (currentRes.status === 404) throw new Error(`City "${city}" not found. Check the spelling and try again.`);
-      if (currentRes.status === 401) throw new Error('Invalid API key. Please check your API key in settings.');
+      if (currentRes.status === 401) throw new Error('Invalid API key');
       throw new Error(`Weather service error (${currentRes.status}). Please try again later.`);
     }
 
@@ -77,8 +72,8 @@ export const weatherApi = {
   },
 
   async getWeatherByCoords(lat, lon) {
-    const key = this.getApiKey();
-    if (!key) throw new Error('API key required');
+    const key = getApiKey();
+    if (!key) throw new Error('API key not configured');
 
     const currentRes = await fetchWithTimeout(
       `${API_BASE}/weather?lat=${lat}&lon=${lon}&appid=${key}`

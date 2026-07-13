@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Settings } from 'lucide-react';
 import { weatherApi } from './services/weatherApi';
 import SearchBar from './components/SearchBar';
 import CurrentWeather from './components/CurrentWeather';
 import WeatherDetailsGrid from './components/WeatherDetailsGrid';
 import HourlyForecast from './components/HourlyForecast';
 import DailyForecast from './components/DailyForecast';
-import ApiKeyModal from './components/ApiKeyModal';
 import WeatherBackground from './components/WeatherBackground';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
@@ -17,21 +15,12 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [lastSearchedCity, setLastSearchedCity] = useState(() => localStorage.getItem('last_city') || '');
   const [hasSearched, setHasSearched] = useState(false);
-
-  const apiKey = weatherApi.getApiKey();
-  const needsApiKey = !apiKey;
 
   const unit = 'metric';
 
   const fetchWeather = useCallback(async (city, coords = null, isUserAction = true) => {
-    if (needsApiKey) {
-      setShowApiKeyModal(true);
-      return;
-    }
-
     if (isUserAction) {
       setHasSearched(true);
     }
@@ -53,8 +42,6 @@ function App() {
       } else {
         const tzOffset = result.current.timezone;
         const processed = weatherApi.processForecastData(result.forecast, tzOffset);
-
-        let daily = processed.daily;
 
         const currentData = { ...result.current };
 
@@ -78,7 +65,7 @@ function App() {
           location: result.location || { name: city },
           timezoneOffset: tzOffset,
           hourly: processed.hourly,
-          daily,
+          daily: processed.daily,
         });
         if (city) {
           const newHistory = weatherApi.saveSearchHistory(city);
@@ -93,16 +80,9 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [needsApiKey]);
+  }, []);
 
   useEffect(() => {
-    if (needsApiKey) {
-      setShowApiKeyModal(true);
-      return;
-    }
-
-    // Only auto-load if user has previously searched (has lastSearchedCity)
-    // and hasn't explicitly searched in this session
     if (lastSearchedCity && !hasSearched) {
       fetchWeather(lastSearchedCity, null, false);
     }
@@ -129,12 +109,6 @@ function App() {
     if (lastSearchedCity) fetchWeather(lastSearchedCity);
   }, [fetchWeather, lastSearchedCity]);
 
-  const handleApiKeySave = useCallback((key) => {
-    weatherApi.setApiKey(key);
-    setShowApiKeyModal(false);
-    if (lastSearchedCity) fetchWeather(lastSearchedCity);
-  }, [fetchWeather, lastSearchedCity]);
-
   const backgroundType = useMemo(() => {
     if (!weatherData?.current?.weather?.[0]?.id) return 'clear';
     const now = Math.floor(Date.now() / 1000);
@@ -148,21 +122,10 @@ function App() {
         type={backgroundType}
         isDay={weatherData?.current ? (Math.floor(Date.now() / 1000) >= weatherData.current.sys.sunrise && Math.floor(Date.now() / 1000) < weatherData.current.sys.sunset) : true}
       />
-      
+
       <div className="app-container">
         <header className="app-header">
           <h1 className="app-title">Weather Forecast Dashboard</h1>
-          <div className="header-actions">
-            {!needsApiKey && (
-              <button 
-                className="icon-btn" 
-                onClick={() => setShowApiKeyModal(true)}
-                aria-label="API Settings"
-              >
-                <Settings size={20} />
-              </button>
-            )}
-          </div>
         </header>
 
         <main className="app-main">
@@ -172,8 +135,7 @@ function App() {
               onGeolocation={handleGeolocation}
               history={searchHistory}
               loading={loading}
-              disabled={needsApiKey}
-              placeholder={needsApiKey ? 'Enter API key in settings first' : 'Search for a city...'}
+              placeholder="Search for a city..."
             />
 
             {hasSearched && weatherData && (
@@ -190,8 +152,8 @@ function App() {
             )}
 
             {error && (
-              <ErrorDisplay 
-                message={error} 
+              <ErrorDisplay
+                message={error}
                 onRetry={handleRetry}
                 onDismiss={() => setError(null)}
               />
@@ -208,7 +170,7 @@ function App() {
                   unit={unit}
                   timezoneOffset={weatherData.timezoneOffset}
                 />
-                
+
                 <div className="weather-details-grid">
                   <WeatherDetailsGrid
                     current={weatherData.current}
@@ -216,13 +178,13 @@ function App() {
                     timezoneOffset={weatherData.timezoneOffset}
                   />
                 </div>
-                
+
                 <HourlyForecast
                   hourly={weatherData.hourly}
                   unit={unit}
                   timezoneOffset={weatherData.timezoneOffset}
                 />
-                
+
                 <DailyForecast
                   daily={weatherData.daily}
                   unit={unit}
@@ -236,18 +198,8 @@ function App() {
 
         <footer className="app-footer">
           <p>Data provided by <a href="https://openweathermap.org/" target="_blank" rel="noopener noreferrer">OpenWeatherMap</a></p>
-          <p className="footer-hint">Press <kbd>/</kbd> to focus search</p>
         </footer>
       </div>
-
-      {showApiKeyModal && (
-        <ApiKeyModal
-          isOpen={showApiKeyModal}
-          onClose={() => setShowApiKeyModal(false)}
-          onSave={handleApiKeySave}
-          currentKey={apiKey}
-        />
-      )}
     </div>
   );
 }
