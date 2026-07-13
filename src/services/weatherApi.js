@@ -159,8 +159,6 @@ export const weatherApi = {
 
     return { hourly, daily };
   },
-
-
 };
 
 export default weatherApi;

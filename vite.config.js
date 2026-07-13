@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Weather-Forecast-Dashboard/',
+  base: '/weather-forecast-dashboard/',
   build: {
     outDir: 'dist',
     sourcemap: true,
