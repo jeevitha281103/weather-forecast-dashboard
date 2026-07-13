@@ -1,3 +1,4 @@
+const API_KEY = '8f5b62bc92dc4ae8621a55c9b1dc8af8';
 const API_BASE = 'https://api.openweathermap.org/data/2.5';
 
 const fetchWithTimeout = async (url, timeout = 8000) => {
@@ -25,9 +26,6 @@ function getWeatherBackground(weatherId, isDay = true) {
   return 'clear';
 }
 
-function getApiKey() {
-  return import.meta.env.VITE_OPENWEATHER_API_KEY || '';
-}
 
 export const weatherApi = {
   getSearchHistory() {
@@ -45,7 +43,7 @@ export const weatherApi = {
   getWeatherBackground,
 
   async getWeatherByCity(city) {
-    const key = getApiKey();
+    const key = API_KEY;
     if (!key) throw new Error('API key not configured');
 
     const currentRes = await fetchWithTimeout(
@@ -72,7 +70,7 @@ export const weatherApi = {
   },
 
   async getWeatherByCoords(lat, lon) {
-    const key = getApiKey();
+    const key = API_KEY;
     if (!key) throw new Error('API key not configured');
 
     const currentRes = await fetchWithTimeout(
