@@ -99,12 +99,39 @@
 
 .app-footer {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: 1rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--color-border);
   color: var(--color-text-dim);
   font-size: 0.875rem;
+}
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: all var(--transition-base);
+}
+
+.social-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--color-primary-glow);
 }
 
 .location-bar {
@@ -134,5 +161,5 @@
 @media (max-width: 640px) {
   .app-container { padding: 1rem; }
   .app-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-  .app-footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  .app-footer { text-align: center; }
 }
