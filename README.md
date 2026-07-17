@@ -1,4 +1,4 @@
-# Weather Forecast Dashboard
+# SkyPulse
 
 A sleek, dark-themed weather dashboard built with React and Vite that delivers real-time forecasts, animated weather effects, and location-based insights — powered by the OpenWeatherMap API.
 

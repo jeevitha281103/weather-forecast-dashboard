@@ -125,7 +125,21 @@ function App() {
 
       <div className="app-container">
         <header className="app-header">
-          <h1 className="app-title">Weather Forecast Dashboard</h1>
+          <h1 className="app-title">
+            <svg className="app-logo" width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="14" stroke="url(#logo-grad)" strokeWidth="2.5"/>
+              <circle cx="16" cy="14" r="5" fill="url(#logo-grad)"/>
+              <path d="M8 22c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="url(#logo-grad)" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M16 4v-2M26 8l1.5-1.5M6 8L4.5 6.5" stroke="url(#logo-grad)" strokeWidth="1.5" strokeLinecap="round"/>
+              <defs>
+                <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
+                  <stop stopColor="#60a5fa"/>
+                  <stop offset="1" stopColor="#a78bfa"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            SkyPulse
+          </h1>
         </header>
 
         <main className="app-main">
