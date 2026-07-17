@@ -57,28 +57,22 @@ const DetailItems = [
     getDetail: (current) => getCloudDescription(current.clouds?.all || 0),
   },
   {
-    key: 'feelsLike',
-    label: 'Feels Like',
+    key: 'temperature',
+    label: 'Temperature',
     icon: Thermometer,
     iconBg: 'rgba(249, 115, 22, 0.15)',
     iconColor: '#f97316',
     getValue: (current, unit) => {
-      const temp = unit === 'imperial' 
-        ? Math.round((current.main.feels_like - 273.15) * 9/5 + 32)
-        : Math.round(current.main.feels_like - 273.15);
+      const temp = unit === 'imperial'
+        ? Math.round((current.main.temp - 273.15) * 9/5 + 32)
+        : Math.round(current.main.temp - 273.15);
       return `${temp}°${unit === 'imperial' ? 'F' : 'C'}`;
     },
     getDetail: (current, unit) => {
-      const actual = unit === 'imperial' 
-        ? Math.round((current.main.temp - 273.15) * 9/5 + 32)
-        : Math.round(current.main.temp - 273.15);
-      const feels = unit === 'imperial' 
+      const feels = unit === 'imperial'
         ? Math.round((current.main.feels_like - 273.15) * 9/5 + 32)
         : Math.round(current.main.feels_like - 273.15);
-      const diff = feels - actual;
-      if (diff > 2) return `Warmer by ${diff}°`;
-      if (diff < -2) return `Cooler by ${Math.abs(diff)}°`;
-      return 'Similar to actual';
+      return `Feels like ${feels}°`;
     },
   },
   {

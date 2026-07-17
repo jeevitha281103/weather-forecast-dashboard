@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { CloudLightning } from 'lucide-react';
 import { weatherApi } from './services/weatherApi';
 import SearchBar from './components/SearchBar';
 import CurrentWeather from './components/CurrentWeather';
@@ -11,11 +12,15 @@ import ErrorDisplay from './components/ErrorDisplay';
 import './App.css';
 
 function App() {
-  const [searchHistory, setSearchHistory] = useState(() => weatherApi.getSearchHistory());
+  const [searchHistory, setSearchHistory] = useState(() => {
+    try { return weatherApi.getSearchHistory(); } catch { return []; }
+  });
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [lastSearchedCity, setLastSearchedCity] = useState(() => localStorage.getItem('last_city') || '');
+  const [lastSearchedCity, setLastSearchedCity] = useState(() => {
+    try { return localStorage.getItem('last_city') || ''; } catch { return ''; }
+  });
   const [hasSearched, setHasSearched] = useState(false);
 
   const unit = 'metric';
@@ -67,11 +72,11 @@ function App() {
           hourly: processed.hourly,
           daily: processed.daily,
         });
-        if (city) {
+        if (city && isUserAction) {
           const newHistory = weatherApi.saveSearchHistory(city);
           setSearchHistory(newHistory);
           setLastSearchedCity(city);
-          localStorage.setItem('last_city', city);
+          try { localStorage.setItem('last_city', city); } catch {}
         }
       }
     } catch (err) {
@@ -86,7 +91,15 @@ function App() {
     if (lastSearchedCity && !hasSearched) {
       fetchWeather(lastSearchedCity, null, false);
     }
-  }, []);
+  }, [lastSearchedCity, hasSearched, fetchWeather]);
+
+  useEffect(() => {
+    if (!weatherData || !lastSearchedCity) return;
+    const interval = setInterval(() => {
+      fetchWeather(lastSearchedCity, null, false);
+    }, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [weatherData, lastSearchedCity, fetchWeather]);
 
   const handleSearch = useCallback((city) => {
     fetchWeather(city);
@@ -116,20 +129,20 @@ function App() {
     return weatherApi.getWeatherBackground(weatherData.current.weather[0].id, isDay);
   }, [weatherData]);
 
+  const isDaytime = useMemo(() => {
+    if (!weatherData?.current?.sys) return true;
+    const now = Math.floor(Date.now() / 1000);
+    return now >= weatherData.current.sys.sunrise && now < weatherData.current.sys.sunset;
+  }, [weatherData]);
+
   return (
     <div className="app" data-weather={backgroundType}>
-      <WeatherBackground
-        type={backgroundType}
-        isDay={weatherData?.current ? (Math.floor(Date.now() / 1000) >= weatherData.current.sys.sunrise && Math.floor(Date.now() / 1000) < weatherData.current.sys.sunset) : true}
-      />
+      <WeatherBackground type={backgroundType} isDay={isDaytime} />
 
       <div className="app-container">
         <header className="app-header">
           <h1 className="app-title">
-            <svg className="app-logo" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5"/>
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-            </svg>
+            <CloudLightning className="app-logo" size={28} strokeWidth={2.5} style={{ color: 'var(--color-primary)' }} />
             <span className="app-title-text">SkyPulse</span>
           </h1>
         </header>
