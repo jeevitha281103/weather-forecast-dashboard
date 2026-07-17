@@ -20,6 +20,13 @@ function getWeatherIcon(weatherId, isDay) {
   return weatherIcons[getWeatherType(weatherId)][isDay ? 'day' : 'night'];
 }
 
+function formatTemp(kelvin, unit) {
+  if (unit === 'imperial') {
+    return Math.round((kelvin - 273.15) * 9 / 5 + 32);
+  }
+  return Math.round(kelvin - 273.15);
+}
+
 export default function CurrentWeather({ data, unit = 'metric', timezoneOffset = 0 }) {
   const [isDay, setIsDay] = useState(true);
   const [animateIcon, setAnimateIcon] = useState(false);
@@ -39,12 +46,13 @@ export default function CurrentWeather({ data, unit = 'metric', timezoneOffset =
   const weatherId = weather.id;
   const main = weather.main;
   const description = weather.description;
-  const temp = data.main.temp;
-  const feelsLike = data.main.feels_like;
-  const tempMin = data.main.temp_min;
-  const tempMax = data.main.temp_max;
+  const temp = formatTemp(data.main.temp, unit);
+  const feelsLike = formatTemp(data.main.feels_like, unit);
+  const tempMin = formatTemp(data.main.temp_min, unit);
+  const tempMax = formatTemp(data.main.temp_max, unit);
   const cityName = data.name || 'Unknown';
   const country = data.sys.country || '';
+  const unitSymbol = unit === 'imperial' ? 'F' : 'C';
 
   const IconComponent = getWeatherIcon(weatherId, isDay);
   const weatherType = getWeatherType(weatherId);
@@ -76,18 +84,18 @@ export default function CurrentWeather({ data, unit = 'metric', timezoneOffset =
               />
             </div>
             <div className="temperature-display">
-              <span className="temperature-value center-text">{Math.round(temp)}°</span>
-              <span className="temperature-unit center-text-muted">°{unit === 'metric' ? 'C' : 'F'}</span>
+              <span className="temperature-value center-text">{temp}°</span>
+              <span className="temperature-unit center-text-muted">°{unitSymbol}</span>
             </div>
             <div className="feels-like center-text-muted">
-              Feels like {Math.round(feelsLike)}°
+              Feels like {feelsLike}°
             </div>
           </div>
 
           <div className="weather-description">
             <p className="description-main center-text">{description.charAt(0).toUpperCase() + description.slice(1)}</p>
             <p className="description-detail center-text-muted">
-              H: {Math.round(tempMax)}° • L: {Math.round(tempMin)}°
+              H: {tempMax}° • L: {tempMin}°
             </p>
           </div>
         </div>

@@ -2,6 +2,21 @@ import { Droplet, Wind, Gauge, Eye, Sunrise, Sunset, Cloud, Thermometer } from '
 import { getWindDirection } from '../utils/weatherHelpers';
 import './WeatherDetailsGrid.css';
 
+function toCelsius(kelvin) {
+  return kelvin - 273.15;
+}
+
+function toFahrenheit(kelvin) {
+  return (kelvin - 273.15) * 9 / 5 + 32;
+}
+
+function formatTemp(kelvin, unit) {
+  if (unit === 'imperial') {
+    return `${toFahrenheit(kelvin).toFixed(1)}°F`;
+  }
+  return `${toCelsius(kelvin).toFixed(1)}°C`;
+}
+
 const DetailItems = [
   {
     key: 'humidity',
@@ -9,8 +24,13 @@ const DetailItems = [
     icon: Droplet,
     iconBg: 'rgba(59, 130, 246, 0.15)',
     iconColor: 'var(--center-primary)',
-    getValue: (current, unit) => `${current.main.humidity}%`,
-    getDetail: (current) => `Dew point: ${Math.round(current.main.temp - (100 - current.main.humidity) / 5)}°C`,
+    getValue: (current) => `${current.main.humidity}%`,
+    getDetail: (current) => {
+      const tempC = toCelsius(current.main.temp);
+      const humidity = current.main.humidity;
+      const dewPointC = tempC - (100 - humidity) / 5;
+      return `Dew point: ${dewPointC.toFixed(1)}°C`;
+    },
   },
   {
     key: 'wind',
@@ -19,9 +39,9 @@ const DetailItems = [
     iconBg: 'rgba(34, 197, 94, 0.15)',
     iconColor: 'var(--center-success)',
     getValue: (current, unit) => {
-      const speed = unit === 'imperial' 
-        ? Math.round(current.wind.speed * 2.237) 
-        : Math.round(current.wind.speed * 3.6);
+      const speed = unit === 'imperial'
+        ? (current.wind.speed * 2.237).toFixed(1)
+        : (current.wind.speed * 3.6).toFixed(1);
       return `${speed} ${unit === 'imperial' ? 'mph' : 'km/h'}`;
     },
     getDetail: (current) => `${getWindDirection(current.wind.deg)} (${current.wind.deg}°)`,
@@ -45,7 +65,7 @@ const DetailItems = [
       const vis = current.visibility || 10000;
       return vis >= 1000 ? `${(vis / 1000).toFixed(1)} km` : `${vis} m`;
     },
-    getDetail: () => 'Clear',
+    getDetail: () => 'Surface',
   },
   {
     key: 'cloudiness',
@@ -62,16 +82,11 @@ const DetailItems = [
     icon: Thermometer,
     iconBg: 'rgba(249, 115, 22, 0.15)',
     iconColor: '#f97316',
-    getValue: (current, unit) => {
-      const temp = unit === 'imperial'
-        ? Math.round((current.main.temp - 273.15) * 9/5 + 32)
-        : Math.round(current.main.temp - 273.15);
-      return `${temp}°${unit === 'imperial' ? 'F' : 'C'}`;
-    },
+    getValue: (current, unit) => formatTemp(current.main.temp, unit),
     getDetail: (current, unit) => {
       const feels = unit === 'imperial'
-        ? Math.round((current.main.feels_like - 273.15) * 9/5 + 32)
-        : Math.round(current.main.feels_like - 273.15);
+        ? toFahrenheit(current.main.feels_like).toFixed(1)
+        : toCelsius(current.main.feels_like).toFixed(1);
       return `Feels like ${feels}°`;
     },
   },

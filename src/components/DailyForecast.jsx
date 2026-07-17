@@ -43,7 +43,7 @@ export default function DailyForecast({ daily, unit, timezoneOffset }) {
         description: day.weather.description,
         isDay,
         humidity: day.humidity,
-        windSpeed: unit === 'imperial' ? Math.round(day.wind_speed * 2.237) : Math.round(day.wind_speed * 3.6),
+        windSpeed: unit === 'imperial' ? (day.wind_speed * 2.237).toFixed(1) : (day.wind_speed * 3.6).toFixed(1),
         windUnit: unit === 'imperial' ? 'mph' : 'km/h',
         windDeg: day.wind_deg,
         pop: Math.round((day.pop || 0) * 100),
